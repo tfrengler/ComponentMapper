@@ -1,0 +1,154 @@
+* {
+	box-sizing: border-box;
+}
+
+body {
+	padding: 15px !important;
+	font-size: 10pt !important;
+}
+
+.row::after {
+	content: "";
+	clear: both;
+	display: block;
+}
+
+[class*="col-"] {
+	float: left;
+	padding: 15px;
+}
+
+ /*
+.col-1 {width: 8.33%;}
+.col-2 {width: 16.66%;}
+.col-3 {width: 25%;}
+.col-4 {width: 33.33%;}
+.col-5 {width: 41.66%;}
+.col-6 {width: 50%;}
+.col-7 {width: 58.33%;}
+.col-8 {width: 66.66%;}
+.col-9 {width: 75%;}
+.col-10 {width: 83.33%;}
+.col-11 {width: 91.66%;}
+.col-12 {width: 100%;}
+*/
+
+/* Standard responsive design uses a 12 column design but I doubled it to 
+accomodate larger inheritance chains with many potential column indentations */
+.col-1 {width: 4.17%;}
+.col-2 {width: 8.32%;}
+.col-3 {width: 12.48%;}
+.col-4 {width: 16.64%;}
+.col-5 {width: 20.8%;}
+.col-6 {width: 24.96%;}
+.col-7 {width: 29.12%;}
+.col-8 {width: 33.28%;}
+.col-9 {width: 37.44%;}
+.col-10 {width:41.6%;}
+.col-11 {width: 45.76%;}
+.col-12 {width: 49.92%;}
+.col-13 {width: 54.08%;}
+.col-14 {width: 58.24%;}
+.col-15 {width: 62.41%;}
+.col-16 {width: 66.56%;}
+.col-17 {width: 70.72%;}
+.col-18 {width: 74.88%;}
+.col-19 {width: 79.04%;}
+.col-20 {width:83.2%;}
+.col-21 {width: 87.36%;}
+.col-22 {width: 91.53%;}
+.col-23 {width: 95.68%;}
+.col-24 {width:100%;}
+
+.Parent {
+	max-width: 100%;
+}
+
+.Child {
+	vertical-align: top;
+	margin-bottom: 2.0825%;
+}
+
+.ParentContainer {
+	text-align: center;
+	overflow: auto;
+}
+
+.ChildContainer {
+	overflow: auto;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #5990ea;
+	margin-bottom: 2.0825%;
+}
+
+.Component {
+	display: inline-block;
+	text-align: center;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	padding: 0.5em;
+	background-color: #5990ea;
+	color: white;
+}
+
+.Indent1 {
+	margin-left: 4.165%;
+}
+
+.Indent2 {
+	margin-left: 8.33%;
+}
+
+.Indent3 {
+	margin-left: 12.48%;
+}
+
+.Indent4 {
+	margin-left: 16.64%;
+}
+
+.Indent5 {
+	margin-left: 20.8%;
+}
+
+.Indent6 {
+	margin-left: 24.96%;
+}
+
+.Indent7 {
+	margin-left: 29.12%;
+}
+
+hr {
+	background-color: white;
+	border-color: white;
+}
+
+h1, h2 {
+	text-align: center;
+}
+
+#DrawingBoard {
+	position: absolute;
+	z-index: -1;
+}
+
+#HeaderRow, #FailedInstantiationRow {
+	background-color: #5990ea;
+	color: white;
+	margin-bottom: 2.0825%;
+	padding: 1em;
+}
+
+#FailedInstantiationRow table {
+	margin: 0 auto;
+}
+
+.CursorHover {
+	cursor: pointer;
+}
+
+span.CursorHover:hover {
+	border-bottom: 1pt solid white;
+}
