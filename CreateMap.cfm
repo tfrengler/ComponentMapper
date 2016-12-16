@@ -2,7 +2,7 @@
 
 <!---
 
-A note on naming conventions: I made up my own list of names for various levels of family relationships CFCs can have. They probably differ from programming standards or normal conventions but in the context of how this function works to render the family tree (working from the top and down the inheritance line, rather than the traditional programmatic "extends", which goes up) it made more sense to me. Crucially it provided a sane way of differentiating the different relationships so my mental wires wouldn't get crossed.
+A note on naming conventions: I made up my own list of names for various levels of family relationships CFCs can have. They probably differ from programming standards or normal conventions but in the context of how this function works to render the family tree (working from the top and down the inheritance line, rather than the traditional programmatic "extends", which goes up) it made more sense to me. Crucially it provided a sane way of differentiating the different relationships in order to keep track of how to render it on screen.
 
 FAMILY RELATIONS OF COMPONENTS:
 
@@ -170,7 +170,7 @@ Orphans (CFCs with no parents or children)
 
 	<cfoutput>
 		<div class="row" id="HeaderRow" >
-			<h1>WEBSERVICES V11 MAP</h1>
+			<h1>COMPONENT MAP</h1>
 		</div>
 
 		<!--- We only loop through the top level parents (Patriarchs) because by the end DrawFamily() will call itself again if it finds any children who are themselves parents --->
@@ -318,11 +318,11 @@ Orphans (CFCs with no parents or children)
 
 	<cfset var stCurrentFailedComponent = structNew() />
 
-	<cfset var sDirectory = "#expandPath("/")#PortalXS\Webservices\v11" />
+	<cfset var sDirectory = "YOUR_CFC_PATH" />
 
 	<cfset var stBuildComponentMetadataCollectionRet = BuildComponentMetadataCollection(
 		ComponentDirectory=sDirectory,
-		ComponentMapping="PortalXS.Webservices.v11."
+		ComponentMapping="YOUR.CFC.MAPPING." <!--- REMEMBER THE TRAILING DOT! --->
 	) />
 
 	<cfset var stComponentCollection = stBuildComponentMetadataCollectionRet.stMetaData />

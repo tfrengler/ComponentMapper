@@ -12,10 +12,15 @@
 	<cfset sMethodName = toString(URL.MethodName) />
 </cfif>
 
-<cfset oComponentInstance = createObject("component", "PortalXS.Webservices.v11.#sComponentName#") />
-<cfset stObjectMetaData = getMetaData(oComponentInstance) />
-<cfset aObjectMethods = stObjectMetaData.Functions />
-<cfset stMethodData = structNew() />
+<cftry>
+	<cfset stObjectMetaData = getMetaData(oComponentInstance) />
+	<cfset aObjectMethods = stObjectMetaData.Functions />
+	<cfset stMethodData = structNew() />
+
+<cfcatch>
+	<cfdump var="#cfcatch#" abort="true" />
+</cfcatch>
+</cftry>
 
 <cfloop array="#aObjectMethods#" index="stCurrentMethod" >
 	<cfif stCurrentMethod.Name EQ sMethodName >
