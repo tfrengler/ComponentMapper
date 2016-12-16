@@ -13,6 +13,7 @@
 </cfif>
 
 <cftry>
+	<cfset oComponentInstance = createObject("component", "YOUR_CFC_PATH.#sComponentName#") />
 	<cfset stObjectMetaData = getMetaData(oComponentInstance) />
 	<cfset aObjectMethods = stObjectMetaData.Functions />
 	<cfset stMethodData = structNew() />
