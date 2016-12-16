@@ -7,6 +7,7 @@ The goal with this mapper was to create something that could create a similar ma
 
 Everything is encased in functions and scoped properly so this page will not leave any traces behind in the global scope. Most of the stuff you may want to modify (what directory of CFCs to target) is in the init()-function down near the bottom. The bits you want to be mindful of are these:
 
+In CreateMap.cfm:
 ```
 <cfset var sDirectory = "" />
 
@@ -15,5 +16,12 @@ Everything is encased in functions and scoped properly so this page will not lea
 	ComponentMapping=""
 ) />
 ```
-
 The ComponentDirectory is the folder where the CFCs live and is used by cfdirectory to read and list the available components. BuildComponentMetadataCollection() will by default try to instantiate the components from the folder where this cfm-file is. If you want to give it a different target you have to pass a mapping via ComponentMapping (NOTE: you must include a trailing dot!)
+
+In GetCFCData.cfm:
+```
+<cfset oComponentInstance = createObject("component", "CFCs.Components.#sComponentName#") />
+```
+This should be fairly self-explanatory.
+
+If the code offends anyone's syntax or convention-sensibilities then I apologize. I am a tester by trade and have no formal education in IT. Programming is something I have taught myself in my free time; I just happen to have colleagues who are willing to give a poor amateur a chance :)
