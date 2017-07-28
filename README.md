@@ -13,22 +13,4 @@ The only limitation I can think of right now is that it can't map a component st
 
 Drawing the inheritance lines between the components is done with Javascript, using Canvas. So if you're using a browser that doesn't support canvas then the lines obviously won't be drawn. This was my first time ever using canvas so forgive me if it isn't perfect.
 
-In CreateMap.cfm:
-```
-<cfset var sDirectory = "YOUR_PATH_HERE" />
-
-<cfset var stBuildComponentMetadataCollectionRet = BuildComponentMetadataCollection(
-	ComponentDirectory=sDirectory,
-	ComponentMapping=""
-) />
-```
-Most of the stuff you may want to modify (what directory of CFCs to target) is in the init()-function down near the bottom.
-The ComponentDirectory is the folder where the CFCs live and is used by cfdirectory to read and list the available components. BuildComponentMetadataCollection() will by default try to instantiate the components from the folder where this cfm-file is. If you want to give it a different target you have to pass a mapping via ComponentMapping (NOTE: you must include a trailing dot!)
-
-In GetCFCData.cfm:
-```
-<cfset oComponentInstance = createObject("component", "YOUR_PATH_HERE.#sComponentName#") />
-```
-This should be fairly self-explanatory.
-
-If the code offends anyone's syntax or convention-sensibilities then I apologize. I am a tester by trade and have no formal education in IT. Programming is something I have taught myself in my free time; I just happen to have colleagues who are willing to give a poor amateur a chance :)
+If the code offends anyone's syntax or convention-sensibilities then I apologize. I am a tester by trade and have no formal education programming (completely self-taught). The code is a straight copy of the version we use at work and variable names etc. are all adhering to our coding standards.
