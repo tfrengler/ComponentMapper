@@ -2,18 +2,35 @@
 
 <cfoutput>
 
-<cfif structKeyExists(URL, "ComponentName") IS false AND structKeyExists(URL, "MethodName") IS false >
-	ERROR:<br/>
-
-	URL-key <b>ComponentName</b> or <b>MethodName</b> is missing...
+<cfif structKeyExists(URL, "ComponentName") IS false >
+	<p>
+		ERROR:<br/>
+		URL-key <b>ComponentName</b> is missing...
+	</p>
 	<cfabort />
+
+<cfelseif structKeyExists(URL, "MethodName") IS false >
+	<p>
+		ERROR:<br/>
+		URL-key <b>MethodName</b> is missing...
+	</p>
+	<cfabort />
+
+<cfelseif structKeyExists(URL, "ComponentMapping") IS false >
+	<p>
+		ERROR:<br/>
+		URL-key <b>ComponentMapping</b> is missing...
+	</p>
+	<cfabort />
+
 <cfelse>
 	<cfset sComponentName = toString(URL.ComponentName) />
 	<cfset sMethodName = toString(URL.MethodName) />
+	<cfset sComponentMapping = toString(URL.ComponentMapping) />
 </cfif>
 
 <cftry>
-	<cfset oComponentInstance = createObject("component", "YOUR_CFC_PATH.#sComponentName#") />
+	<cfset oComponentInstance = createObject("component", "#ComponentMapping#.#sComponentName#") />
 	<cfset stObjectMetaData = getMetaData(oComponentInstance) />
 	<cfset aObjectMethods = stObjectMetaData.Functions />
 	<cfset stMethodData = structNew() />

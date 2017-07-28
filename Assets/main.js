@@ -147,8 +147,8 @@ main.DrawFamilyTree = function() {
 
 	var oFamilyMap = this.GetFamilyMap();
 	// In case the family map is not ready (a huge inheritance chain could cause this) the function checks and then sets a timeout to call itself again
-	if (typeof this.GetFamilyMap() == "undefined") {
-		window.setTimeOut(main.DrawFamilyTree, 3000);
+	if (typeof this.GetFamilyMap() === "undefined") {
+		window.setTimeOut(main.DrawFamilyTree, 5000);
 		return false;
 	};
 
@@ -180,7 +180,7 @@ main.DrawFamilyTree = function() {
 	return true;
 };
 
-main.GetMethodData = function(ComponentName, MethodName) {
+main.GetMethodData = function(ComponentName, MethodName, ComponentMapping) {
 	main.DestroyDialog(); // Removes existing dialog. If the user clicks another method while an existing dialog is open then the close() method is not invoked on the dialog
 
 	var oDialog = document.createElement("div");
@@ -189,7 +189,7 @@ main.GetMethodData = function(ComponentName, MethodName) {
 
 	document.getElementsByTagName("body")[0].appendChild(oDialog);
 
-	var RequestParameters = "?ComponentName=" + ComponentName.trim() + "&MethodName=" + MethodName.trim();
+	var RequestParameters = "?ComponentName=" + ComponentName.trim() + "&MethodName=" + MethodName.trim() + "&ComponentMapping=" + ComponentMapping.trim();
 	$("#MethodDataDialog").load(
 		"GetCFCData.cfm" + RequestParameters
 	);

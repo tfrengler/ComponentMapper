@@ -2,7 +2,8 @@
 
 <!---
 
-A note on naming conventions: I made up my own list of names for various levels of family relationships CFCs can have. They probably differ from programming standards or normal conventions but in the context of how this function works to render the family tree (working from the top and down the inheritance line, rather than the traditional programmatic "extends", which goes up) it made more sense to me. Crucially it provided a sane way of differentiating the different relationships in order to keep track of how to render it on screen.
+A note on naming conventions: I made up my own list of names for various levels of family relationships CFCs can have. 
+They probably differ from programming standards or normal conventions but in the context of how this function works to render the family tree (working from the top and down the inheritance line, rather than the traditional programmatic "extends", which goes up) it made more sense to me. Crucially it provided a sane way of differentiating the different relationships in order to keep track of how to render it on screen.
 
 FAMILY RELATIONS OF COMPONENTS:
 
@@ -12,8 +13,6 @@ Children (CFCs with parents but no children)
 Orphans (CFCs with no parents or children)
 
 --->
-
-<!--- BACKEND DATA FETCHING/BUILDING FUNCTIONS --->
 
 <cffunction name="BuildComponentMetadataCollection" returntype="struct" access="public" hint="Builds a struct with two keys: one with the metadata of the components it finds. The other with an array of objects that for whatever reason couldn't be instantiated and the reason why" output="true" >
 
@@ -27,8 +26,13 @@ Orphans (CFCs with no parents or children)
 	<cfset var sComponentName = "" />
 	<cfset var oComponentInstance = "" />
 	<cfset var oComponentMetaData = "" />
+	<cfset var sMappingPathToTest = "" />
 
 	<cfdirectory action="list" directory="#arguments.ComponentDirectory#" name="qComponentList" filter="*.cfc" />
+
+	<cfif qComponentList.RecordCount IS 0 >
+		<cfthrow message="Error when parsing directory for Coldfusion components" detail="The directory you are pointing argument 'ComponentDirectory' at did not contain any components: #arguments.ComponentDirectory#" />
+	</cfif>
 
 	<cfloop query="qComponentList" >
 
@@ -303,7 +307,7 @@ Orphans (CFCs with no parents or children)
 
 			<cfif arrayLen(aComponentFunctions) GT 0 >
 				<cfloop array="#aComponentFunctions#" index="stCurrentFunction" >
-					<span class="CursorHover" id="#Name#.#stCurrentFunction.Name#" title="#stCurrentFunction.Name#" onclick="main.GetMethodData('#Name#', '#stCurrentFunction.Name#')" >#stCurrentFunction.Name#()</span><br/>
+					<span class="CursorHover" id="#Name#.#stCurrentFunction.Name#" title="#stCurrentFunction.Name#" onclick="main.GetMethodData('#Name#', '#stCurrentFunction.Name#', '#sCleanComponentMapping#')" >#stCurrentFunction.Name#()</span><br/>
 				</cfloop>
 			<cfelse>
 				<i>No methods</i>
@@ -315,14 +319,16 @@ Orphans (CFCs with no parents or children)
 <!--- INITIALIZATION --->
 
 <cffunction name="init" returntype="void" access="public" output="true" >
+	<cfargument name="componentDirectory" type="string" required="true" />
+	<cfargument name="componentMapping" type="string" required="true" />
 
 	<cfset var stCurrentFailedComponent = structNew() />
 
-	<cfset var sDirectory = "YOUR_CFC_PATH" />
+	<cfset var sDirectory = arguments.componentDirectory />
 
 	<cfset var stBuildComponentMetadataCollectionRet = BuildComponentMetadataCollection(
 		ComponentDirectory=sDirectory,
-		ComponentMapping="YOUR.CFC.MAPPING." <!--- REMEMBER THE TRAILING DOT! --->
+		ComponentMapping="#arguments.componentMapping#."
 	) />
 
 	<cfset var stComponentCollection = stBuildComponentMetadataCollectionRet.stMetaData />
@@ -405,4 +411,172 @@ Orphans (CFCs with no parents or children)
 	
 </cffunction>
 
-<cfset init() />
+<cfif structIsEmpty(FORM) IS false >
+
+	<cfset bFormDataOK = true />
+	<cfset bFormComponentDirectoryEmpty = false />
+	<cfset bFormComponentMappingEmpty = false />
+	<cfset bComponentDirectoryDoesNotExist = false />
+	<cfset bComponentMappingTestFailed = false />
+	<cfset bComponentDirectoryAndMappingDirectoryNotTheSame = false />
+
+	<cfif len(FORM.ComponentDirectory) IS 0 >
+		<cfset bFormDataOK = false />
+		<cfset bFormComponentDirectoryEmpty = true />
+	</cfif>
+
+	<cfif len(FORM.ComponentMapping) IS 0 >
+		<cfset bFormDataOK = false />
+		<cfset bFormComponentMappingEmpty = true />
+	</cfif>
+
+	<cfif directoryExists(FORM.ComponentDirectory) IS false >
+		<cfset bFormDataOK = false />
+		<cfset bComponentDirectoryDoesNotExist = true />
+	</cfif>
+
+	<cfif find(".", FORM.ComponentMapping) GT 0 >
+
+		<cfset sConvertedComponentMapping = expandPath("\" & replace(FORM.ComponentMapping, ".", "\", "all")) />
+		<cfset sComponentMappingAbsolutePath = listDeleteAt(sConvertedComponentMapping, (listLen(sConvertedComponentMapping, "\")-1), "\") />
+
+	<cfelse>
+		<cfset sComponentMappingAbsolutePath = expandPath("\" & FORM.ComponentMapping) /> 
+	</cfif>
+
+	<cfif directoryExists(sComponentMappingAbsolutePath) IS false >
+		<cfset bFormDataOK = false />
+		<cfset bComponentMappingTestFailed = true />
+	</cfif>
+
+	<cfif bComponentDirectoryDoesNotExist IS false AND bComponentMappingTestFailed IS false >
+
+		<cfif FORM.ComponentDirectory IS NOT sComponentMappingAbsolutePath >
+			<cfset bFormDataOK = false />
+			<cfset bComponentDirectoryAndMappingDirectoryNotTheSame = true />
+		</cfif>
+	</cfif>
+
+	<cfif bFormDataOK IS true >
+
+		<cfset sCleanComponentMapping = FORM.ComponentMapping >
+
+		<cfif find("\", FORM.ComponentMapping) >
+			<cfset sCleanComponentMapping = replace(sCleanComponentMapping, "\", ".", "all") />
+		</cfif>
+
+		<cfif find("/", sCleanComponentMapping) >
+			<cfset sCleanComponentMapping = replace(sCleanComponentMapping, "/", ".", "all") />
+		</cfif>
+
+		<cfif left(sCleanComponentMapping, 1) IS "." >
+			<cfset sCleanComponentMapping = right(sCleanComponentMapping, (len(sCleanComponentMapping) -1 )) />
+		</cfif>
+
+		<cfif right(sCleanComponentMapping, 1) IS "." >
+			<cfset sCleanComponentMapping = left(sCleanComponentMapping, (len(sCleanComponentMapping) -1 )) />
+		</cfif>
+
+		<cfset init(
+			componentDirectory=FORM.ComponentDirectory,
+			componentMapping=sCleanComponentMapping
+		) />
+	</cfif>
+</cfif>
+
+<cfif structIsEmpty(FORM) IS true OR isDefined("bFormDataOK") >
+
+	<cfset sFormComponentDirectoryValue = "" />
+	<cfset sFormComponentMappingValue = "" />
+
+	<cfif structKeyExists(FORM, "ComponentDirectory") AND len(FORM.ComponentDirectory) GT 0 >
+		<cfset sFormComponentDirectoryValue = FORM.ComponentDirectory />
+	</cfif>
+
+	<cfif structKeyExists(FORM, "ComponentMapping") AND len(FORM.ComponentMapping) GT 0 >
+		<cfset sFormComponentMappingValue = FORM.ComponentMapping />
+	</cfif>
+
+	<!DOCTYPE html>
+	<html>
+		<head>
+			<title>Component Map</title>
+
+			<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+			<style type="text/css">
+				#ComponentMapForm input[type="text"] {
+					width: 50%;
+				}
+
+				.Error {
+					color: red;
+				}				
+			</style>
+		</head>
+
+		<body>
+			<cfoutput>
+			<div>
+				<h2>Greetings and welcome to the Awesome Component Mapper Utility (ACMU)!</h2>
+				<p>
+					This tool parses a folder with components, reads them and uses their metadata to construct a flowchart-like visual map. It lists each CFC - with their properties and methods - and draws inheritance lines between them. <br/>
+					In addition you can click on each method to get a jQuery dialog that gives basic information about the method such as a list of the different arguments, return type, access etc. <br/>
+					The goal with this mapper was to create something that could create a similar map that you'd normally see in a PDF or an MS Visio-document, but have it be dynamic so that you don't ever have to manually maintain a document yourself.<br/>
+					Although initially created as automated documentation for the webservices it has been developed and tested on our regular components folder.<br/>
+					The only limitation I can think of right now is that it can't map a component structure spread across various folders - it can only read and create a map of components from one folder.
+				</p>
+				<p>
+					<u>USAGE:</u><br/>
+					<ol>
+						<li>Put in the path to the directory of components you want to map.</li>
+						<li>Next put in a mapping to the components in this folder (this is necessary because of use of introspection).</li>
+						<li>Profit!</li>
+					</ol>
+				</p>
+				<hr/>
+
+				<form id="ComponentMapForm" action="index.cfm" method="POST" >
+
+					<p>Path to component directory</p>
+					<input name="ComponentDirectory" type="text" value="#sFormComponentDirectoryValue#" placeholder="...\CFCs\Components" />
+					<p>Mapping to the components. Use any notation, we will attempt to verify the path and convert it to dot notation (if more than one folder deep).</p>
+					<input name="ComponentMapping" type="text" value="#sFormComponentMappingValue#" />
+
+					<br/><br/>
+					<input name="Submit" type="submit" value="GO!" />
+				</form>
+				<hr/>
+
+				<cfif isDefined("bFormDataOK") AND bFormDataOK IS false >
+
+					<cfif bFormComponentDirectoryEmpty IS true >
+						<h2 class="Error" >ERROR: Component directory field is empty</h2>
+					</cfif>
+
+					<cfif bFormComponentMappingEmpty IS true >
+						<h2 class="Error" >ERROR: Component mapping field is empty</h2>
+					</cfif>
+
+					<cfif bComponentDirectoryDoesNotExist IS true >
+						<h2 class="Error" >ERROR: Component directory does not exist<h2>
+					</cfif>
+
+					<cfif bComponentMappingTestFailed IS true >
+						<h2 class="Error" >ERROR: Component mapping could not be verified. Extrapolated absolute path: #sComponentMappingAbsolutePath#</h2>
+					</cfif>
+
+					<cfif bComponentDirectoryAndMappingDirectoryNotTheSame IS true >
+						<h2 class="Error" >
+							ERROR: Component directory and mapping not pointing to the same directory:<br/>
+							Extrapolated mapping directory: <u>#sComponentMappingAbsolutePath#</u><br/>
+							Component directory: <u>#FORM.ComponentDirectory#</u>
+						</h2>
+					</cfif>
+
+				</cfif>
+			</div>
+			</cfoutput>
+		</body>
+	</html>
+</cfif>
